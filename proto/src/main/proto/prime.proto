@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.szepep.dixa.grpc";
+
+package dixa;
+
+service PrimeNumberService {
+  rpc get (PrimeRequest) returns (stream PrimeResponse);
+}
+
+message PrimeRequest {
+  int32 n = 1;
+}
+
+message PrimeResponse {
+  int32 prime = 1;
+}
