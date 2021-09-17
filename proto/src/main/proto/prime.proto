@@ -1,18 +1,19 @@
 syntax = "proto3";
 
 option java_multiple_files = true;
-option java_package = "com.szepep.dixa.grpc";
+option java_package = "com.szepep.dixa.proto";
+option java_outer_classname = "PrimeNumber";
 
 package dixa;
 
-service PrimeNumberService {
-  rpc get (PrimeRequest) returns (stream PrimeResponse);
+service Service {
+  rpc get (Request) returns (stream Response);
 }
 
-message PrimeRequest {
+message Request {
   int32 n = 1;
 }
 
-message PrimeResponse {
+message Response {
   int32 prime = 1;
 }
