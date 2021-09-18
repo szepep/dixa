@@ -1,6 +1,7 @@
 package com.szepep.dixa.primes.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -12,6 +13,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 @Slf4j
+@Component
 public class LazyGenerator implements Generator {
 
     private final Map<Integer, Long> primeNumbers;
@@ -81,6 +83,5 @@ public class LazyGenerator implements Generator {
             }
         };
     }
-
 
 }

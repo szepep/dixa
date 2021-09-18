@@ -102,7 +102,6 @@ class LazyGeneratorTest {
         try (var log = new LogMessages(LazyGenerator.class)) {
             var sharedGenerator = new LazyGenerator();
 
-
             var executor = Executors.newFixedThreadPool(runs);
             var futures = IntStream.range(0, runs)
                     .map(i -> (i + 1) * 10)

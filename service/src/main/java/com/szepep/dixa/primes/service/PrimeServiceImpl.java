@@ -12,7 +12,11 @@ import reactor.core.publisher.Mono;
 @Service
 public class PrimeServiceImpl extends ReactorServiceGrpc.ServiceImplBase {
 
-    private final Generator generator = new LazyGenerator();
+    private final Generator generator;
+
+    PrimeServiceImpl(Generator generator) {
+        this.generator = generator;
+    }
 
     @Override
     public Flux<Response> get(Mono<Request> request) {
