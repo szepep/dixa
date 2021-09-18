@@ -1,5 +1,5 @@
 rootProject.name = 'primes'
 
-include ":proto"
-include ":proxy"
-include ":service"
+include "proto"
+include "proxy"
+include "service"

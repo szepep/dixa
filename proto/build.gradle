@@ -1,5 +1,6 @@
 apply plugin: 'java'
 apply plugin: 'com.google.protobuf'
+apply plugin: 'idea'
 
 repositories {
     maven { url "https://plugins.gradle.org/m2/" }
@@ -27,11 +28,17 @@ dependencies {
     }
 }
 
+clean {
+    delete protobuf.generatedFilesBaseDir
+}
+
+idea { module {} }
 
 protobuf {
     protoc {
         artifact = "com.google.protobuf:protoc:${protobufVersion}"
     }
+    generatedFilesBaseDir = "$projectDir/gen"
     plugins {
         grpc {
             artifact = "io.grpc:protoc-gen-grpc-java:${grpcVersion}"
@@ -42,7 +49,7 @@ protobuf {
     }
     generateProtoTasks {
         ofSourceSet("main")*.plugins {
-            grpc { }
+            grpc {}
             reactor {}
         }
     }
