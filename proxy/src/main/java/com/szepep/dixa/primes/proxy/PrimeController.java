@@ -20,11 +20,13 @@ public class PrimeController {
     }
 
     /**
+     * The endpoint returns prime numbers until number.
+     * <p>
      * APPLICATION_STREAM_JSON is deprecated but Chrome shows the continuous response.
      * APPLICATION_NDJSON should be used but chrome downloads the response.
      *
-     * @param number
-     * @return
+     * @param number The uppor limit of prime numbers
+     * @return All prime numbers less than equal to number.
      */
     @GetMapping(value = "/{number}", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
     public Flux<String> primes(@PathVariable("number") long number) {
