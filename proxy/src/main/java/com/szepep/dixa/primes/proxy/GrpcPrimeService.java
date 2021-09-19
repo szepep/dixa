@@ -4,18 +4,16 @@ import com.google.common.collect.Sets;
 import com.szepep.dixa.proto.ReactorServiceGrpc;
 import com.szepep.dixa.proto.Request;
 import com.szepep.dixa.proto.Response;
-import io.grpc.*;
-import lombok.Data;
+import io.grpc.Status;
+import io.grpc.StatusException;
+import io.grpc.StatusRuntimeException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.util.retry.Retry;
 
 import java.time.Duration;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 import static io.grpc.Status.Code.*;
 
@@ -29,33 +27,25 @@ public class GrpcPrimeService implements PrimeService {
             PERMISSION_DENIED
     );
 
-    private final ManagedChannel channel;
     private final ReactorServiceGrpc.ReactorServiceStub stub;
+    private final GrpcConfiguration.GrpcConfig config;
 
-    public GrpcPrimeService(GrpcConfig config) {
-        channel = ManagedChannelBuilder
-                .forAddress(config.getHost(), config.getPort())
-                .usePlaintext()
-                .build();
-
-        stub = ReactorServiceGrpc.newReactorStub(channel);
-        log.info("gRPC client started {}:{}", config.getHost(), config.getPort());
-
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            try {
-                channel.shutdown().awaitTermination(1, TimeUnit.SECONDS);
-                log.info("gRPC client closed");
-            } catch (InterruptedException e) {
-                log.error("Interrupted", e);
-            }
-        }));
+    public GrpcPrimeService(
+            ReactorServiceGrpc.ReactorServiceStub stub,
+            GrpcConfiguration.GrpcConfig config
+    ) {
+        this.stub = stub;
+        this.config = config;
     }
 
     @Override
     public Flux<Long> prime(Long number) {
         return stub.get(Request.newBuilder().setN(number).build())
                 .map(Response::getPrime)
-                .retryWhen(Retry.backoff(3, Duration.ofSeconds(5)).filter(this::retry));
+                .retryWhen(Retry
+                        .backoff(config.getMaxRetry(), Duration.ofMillis(config.getRetryTimeoutMills()))
+                        .filter(this::retry)
+                );
     }
 
     private boolean retry(Throwable throwable) {
@@ -68,14 +58,6 @@ public class GrpcPrimeService implements PrimeService {
             return true;
         }
         return !DO_NOT_RETRY.contains(code);
-    }
-
-    @Configuration
-    @ConfigurationProperties(prefix = "grpc")
-    @Data
-    static class GrpcConfig {
-        private String host = "localhost";
-        private Integer port = 8080;
     }
 
 }

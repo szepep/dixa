@@ -20,12 +20,12 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
 
     implementation "io.grpc:grpc-protobuf:${grpcVersion}"
-    implementation "io.grpc:grpc-stub:${grpcVersion}"
 
     runtimeOnly "io.grpc:grpc-netty-shaded:${grpcVersion}"
 
     implementation 'org.springframework.boot:spring-boot-starter'
 
+    testImplementation "io.grpc:grpc-stub:${grpcVersion}"
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testAnnotationProcessor 'org.projectlombok:lombok'
 }
