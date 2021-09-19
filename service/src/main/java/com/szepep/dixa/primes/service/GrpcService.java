@@ -4,6 +4,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.szepep.dixa.proto.ReactorServiceGrpc;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
@@ -25,7 +26,7 @@ public class GrpcService {
             GrpcConfig config
     ) {
         this.service = service;
-        this.port = config.port;
+        this.port = config.getPort();
     }
 
     public void start() throws IOException {
@@ -59,7 +60,8 @@ public class GrpcService {
 
     @Configuration(proxyBeanMethods = false)
     @ConfigurationProperties(prefix = "grpc")
+    @Data
     static class GrpcConfig {
-        int port = 8080;
+        private int port;
     }
 }

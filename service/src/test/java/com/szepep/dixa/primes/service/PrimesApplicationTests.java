@@ -9,32 +9,43 @@ import io.grpc.ManagedChannelBuilder;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
 
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
+import static com.szepep.dixa.primes.service.Utils.nextFreePort;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@SpringBootTest
-@Import(PrimesApplicationTests.TestConfig.class)
+@SpringBootTest(
+        properties = {
+                "grpc.port=${port}"
+        }
+)
 @Slf4j
 class PrimesApplicationTests {
+
+    @BeforeAll
+    public static void beforeAll() {
+        var port = nextFreePort(20_000, 30_000);
+        System.setProperty("port", Integer.toString(port));
+    }
+
+    @AfterAll
+    public static void afterAll() {
+        System.clearProperty("port");
+    }
 
     @Autowired
     private GrpcService.GrpcConfig config;
 
     @Test
     void happyPathTest() throws Exception {
-        try (var s = new Stub(config.port)) {
+        try (var s = new Stub(config.getPort())) {
             var primes = s.stub.get(Request.newBuilder().setN(10).build())
                     .map(Response::getPrime)
                     .collectList()
@@ -46,7 +57,7 @@ class PrimesApplicationTests {
 
     @Test
     void negativeInput() throws Exception {
-        try (var s = new Stub(config.port)) {
+        try (var s = new Stub(config.getPort())) {
             var e = assertThrows(StatusRuntimeException.class, () ->
                     s.stub.get(Request.newBuilder().setN(-10).build())
                             .map(Response::getPrime)
@@ -74,35 +85,4 @@ class PrimesApplicationTests {
             log.info("gRPC client shut down successfully.");
         }
     }
-
-    @TestConfiguration(proxyBeanMethods = false)
-    static class TestConfig {
-
-        @Bean
-        GrpcService.GrpcConfig config() {
-            GrpcService.GrpcConfig grpcConfig = new GrpcService.GrpcConfig();
-            grpcConfig.port = nextFreePort(20_000, 30_000);
-            return grpcConfig;
-        }
-
-        private int nextFreePort(int from, int to) {
-            int port;
-            while (!isLocalPortFree(port = random(from, to))) {/* noop */}
-            return port;
-        }
-
-        private int random(int from, int to) {
-            return ThreadLocalRandom.current().nextInt(from, to);
-        }
-
-        private boolean isLocalPortFree(int port) {
-            try {
-                new ServerSocket(port).close();
-                return true;
-            } catch (IOException e) {
-                return false;
-            }
-        }
-    }
-
 }
