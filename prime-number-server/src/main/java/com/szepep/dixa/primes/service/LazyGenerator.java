@@ -37,7 +37,7 @@ public class LazyGenerator implements Generator {
         primeNumbers.put(0, 2L);
         logPrime(2);
 
-        max = new AtomicLong(2);
+        max = new AtomicLong(3);
     }
 
     private static void logPrime(long prime) {
@@ -50,9 +50,10 @@ public class LazyGenerator implements Generator {
     }
 
     private Long calcNext() {
+        long prime;
         //noinspection StatementWithEmptyBody
-        while (!isPrime(max.incrementAndGet())) { /* noop */ }
-        return max.get();
+        while (!isPrime(prime = max.getAndAdd(2))) { /* noop */ }
+        return prime;
     }
 
     private boolean isPrime(long n) {
@@ -70,8 +71,8 @@ public class LazyGenerator implements Generator {
      * Stream of prime numbers. Should not be accessed from multiple threads simultaneously.
      *
      * @param number The limit of the prime numbers in result. No result is larger than number.
-     * @return
-     * @throws IllegalArgumentException
+     * @return Stream of prime numbers
+     * @throws IllegalArgumentException if the input number is wrong.
      */
     @Override
     public Stream<Long> primesUntil(long number) throws IllegalArgumentException {
