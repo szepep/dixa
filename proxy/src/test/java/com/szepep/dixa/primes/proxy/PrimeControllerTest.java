@@ -53,4 +53,16 @@ class PrimeControllerTest {
 
         verify(primeService).prime(eq(2L));
     }
+
+    @Test
+    public void testNegativeInput() {
+        client.get()
+                .uri("/prime/-10")
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(String.class)
+                .consumeWith(body -> assertEquals(
+                        "The number must be greater or equal to 0",
+                        body.getResponseBody()));
+    }
 }
