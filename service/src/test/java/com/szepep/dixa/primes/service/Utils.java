@@ -10,6 +10,7 @@ final class Utils {
 
     static int nextFreePort(int from, int to) {
         int port;
+        //noinspection StatementWithEmptyBody
         while (!isLocalPortFree(port = random(from, to))) {/* noop */}
         return port;
     }

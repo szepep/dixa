@@ -28,6 +28,7 @@ public class PrimeController {
      * @param number The uppor limit of prime numbers
      * @return All prime numbers less than equal to number.
      */
+    @SuppressWarnings("deprecation")
     @GetMapping(value = "/{number}", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
     public Flux<String> primes(@PathVariable("number") long number) {
         AtomicBoolean first = new AtomicBoolean(true);

@@ -77,6 +77,7 @@ class GrpcPrimeServiceTest {
 
     @Test
     public void retry() {
+        //noinspection unchecked
         when(mockService.get(any())).thenReturn(
                 Flux.error(new IllegalStateException()),
                 Flux.error(new IllegalStateException()),
@@ -92,6 +93,7 @@ class GrpcPrimeServiceTest {
 
     @Test
     public void retryFailsDueToExceedingLimit() {
+        //noinspection unchecked
         when(mockService.get(any())).thenReturn(
                 Flux.error(new IllegalStateException()),
                 Flux.error(new IllegalStateException()),
@@ -111,6 +113,7 @@ class GrpcPrimeServiceTest {
 
     @Test
     public void retryFailsDueToIllegalArgument() {
+        //noinspection unchecked
         when(mockService.get(any())).thenReturn(
                 Flux.error(new StatusRuntimeException(Status.INVALID_ARGUMENT)),
                 primes(2, 3, 5, 7, 11)
@@ -125,6 +128,7 @@ class GrpcPrimeServiceTest {
 
     @Test
     public void unknownIsRetried() {
+        //noinspection unchecked
         when(mockService.get(any())).thenReturn(
                 Flux.error(new StatusRuntimeException(Status.UNKNOWN)),
                 primes(2, 3, 5, 7, 11)

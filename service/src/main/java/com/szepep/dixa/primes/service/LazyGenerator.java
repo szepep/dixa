@@ -50,6 +50,7 @@ public class LazyGenerator implements Generator {
     }
 
     private Long calcNext() {
+        //noinspection StatementWithEmptyBody
         while (!isPrime(max.incrementAndGet())) { /* noop */ }
         return max.get();
     }
