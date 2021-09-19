@@ -1,9 +1,9 @@
 version: "3"
 services:
-  service:
-    image: "service:0.0.1-SNAPSHOT"
-  proxy:
-    image: "proxy:0.0.1-SNAPSHOT"
+  prime-number-server:
+    image: "prime-number-server:0.0.1-SNAPSHOT"
+  proxy-service:
+    image: "proxy-service:0.0.1-SNAPSHOT"
     ports:
       - "8080:8080"
-    command: --grpc.host=service --grpc.port=8080
+    command: --grpc.host=prime-number-server --grpc.port=8080
