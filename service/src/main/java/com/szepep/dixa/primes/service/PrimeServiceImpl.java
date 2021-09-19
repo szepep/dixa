@@ -5,6 +5,7 @@ import com.szepep.dixa.proto.Request;
 import com.szepep.dixa.proto.Response;
 import io.grpc.Status;
 import io.grpc.StatusException;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -12,13 +13,10 @@ import reactor.core.publisher.Mono;
 
 @Slf4j
 @Service
+@AllArgsConstructor
 public class PrimeServiceImpl extends ReactorServiceGrpc.ServiceImplBase {
 
     private final Generator generator;
-
-    PrimeServiceImpl(Generator generator) {
-        this.generator = generator;
-    }
 
     @Override
     public Flux<Response> get(Mono<Request> request) {

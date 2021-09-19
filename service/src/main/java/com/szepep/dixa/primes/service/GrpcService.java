@@ -5,6 +5,7 @@ import com.szepep.dixa.proto.ReactorServiceGrpc;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
@@ -14,29 +15,22 @@ import java.io.IOException;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class GrpcService {
 
     private final ReactorServiceGrpc.ServiceImplBase service;
-    private final int port;
+    private final GrpcConfig config;
+
     private Server server;
 
-
-    GrpcService(
-            ReactorServiceGrpc.ServiceImplBase service,
-            GrpcConfig config
-    ) {
-        this.service = service;
-        this.port = config.getPort();
-    }
-
     public void start() throws IOException {
-        log.info("Starting gRPC on port {}.", port);
+        log.info("Starting gRPC on port {}.", config.getPort());
         server = ServerBuilder
-                .forPort(port)
+                .forPort(config.getPort())
                 .addService(service)
                 .build()
                 .start();
-        log.info("gRPC server started, listening on {}.", port);
+        log.info("gRPC server started, listening on {}.", config.getPort());
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             log.info("Shutting down gRPC server.");

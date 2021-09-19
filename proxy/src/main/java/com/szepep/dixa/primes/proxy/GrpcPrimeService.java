@@ -7,6 +7,7 @@ import com.szepep.dixa.proto.Response;
 import io.grpc.Status;
 import io.grpc.StatusException;
 import io.grpc.StatusRuntimeException;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -18,6 +19,7 @@ import java.util.Set;
 import static io.grpc.Status.Code.*;
 
 @Service
+@AllArgsConstructor
 @Slf4j
 public class GrpcPrimeService implements PrimeService {
 
@@ -29,14 +31,6 @@ public class GrpcPrimeService implements PrimeService {
 
     private final ReactorServiceGrpc.ReactorServiceStub stub;
     private final GrpcConfiguration.GrpcConfig config;
-
-    public GrpcPrimeService(
-            ReactorServiceGrpc.ReactorServiceStub stub,
-            GrpcConfiguration.GrpcConfig config
-    ) {
-        this.stub = stub;
-        this.config = config;
-    }
 
     @Override
     public Flux<Long> prime(Long number) {

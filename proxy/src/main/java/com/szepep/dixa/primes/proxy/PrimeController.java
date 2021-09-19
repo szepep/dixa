@@ -1,6 +1,7 @@
 package com.szepep.dixa.primes.proxy;
 
 import com.google.common.base.Preconditions;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -11,13 +12,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 @RestController
 @RequestMapping("/prime")
+@AllArgsConstructor
 public class PrimeController {
 
     private final PrimeService service;
-
-    public PrimeController(PrimeService service) {
-        this.service = service;
-    }
 
     /**
      * The endpoint returns prime numbers until number.
