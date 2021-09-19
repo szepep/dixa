@@ -1,22 +1,35 @@
 package com.szepep.dixa.primes.service;
 
+import com.google.common.base.Preconditions;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.concurrent.ThreadSafe;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Function;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+/**
+ * Generates lazy stream of prime numbers and caches already identified primes.
+ */
 @Slf4j
 @Component
+@ThreadSafe
 public class LazyGenerator implements Generator {
 
-    private final Map<Integer, Long> primeNumbers;
+    /**
+     * Cache of already computed prime numbers.
+     * <p>
+     * In single threaded environment it is better to use an ArrayList for this purpose.
+     * However in multithreaded environment we can use the atomic
+     * {@link ConcurrentHashMap#computeIfAbsent(Object, Function)} to ensure no new prime is calculated multiple times.
+     */
+    private final ConcurrentHashMap<Integer, Long> primeNumbers;
     private final AtomicLong max;
 
     public LazyGenerator() {
@@ -52,8 +65,17 @@ public class LazyGenerator implements Generator {
         return prime;
     }
 
+    /**
+     * Stream of prime numbers. Should not be accessed from multiple threads simultaneously.
+     *
+     * @param number The limit of the prime numbers in result. No result is larger than number.
+     * @return
+     * @throws IllegalArgumentException
+     */
     @Override
-    public Stream<Long> primesUntil(long number) {
+    public Stream<Long> primesUntil(long number) throws IllegalArgumentException {
+        Preconditions.checkArgument(number >= 0, "The number must be zero or positive");
+
         var primes = primeNumbersJustAfter(number);
         var primesStream = toStream(primes);
         return primesStream.takeWhile(i -> i <= number);

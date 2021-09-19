@@ -6,6 +6,8 @@ import com.szepep.dixa.proto.Request;
 import com.szepep.dixa.proto.Response;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import io.grpc.Status;
+import io.grpc.StatusRuntimeException;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @Import(PrimesApplicationTests.TestConfig.class)
@@ -30,14 +33,27 @@ class PrimesApplicationTests {
     private GrpcService.GrpcConfig config;
 
     @Test
-    void contextLoads() throws Exception {
-        try (var cs = new Stub(config.port)) {
-            var primes = cs.stub.get(Request.newBuilder().setN(10).build())
+    void happyPathTest() throws Exception {
+        try (var s = new Stub(config.port)) {
+            var primes = s.stub.get(Request.newBuilder().setN(10).build())
                     .map(Response::getPrime)
                     .collectList()
                     .block();
 
             assertEquals(Lists.newArrayList(2L, 3L, 5L, 7L), primes);
+        }
+    }
+
+    @Test
+    void negativeInput() throws Exception {
+        try (var s = new Stub(config.port)) {
+            var e = assertThrows(StatusRuntimeException.class, () ->
+                    s.stub.get(Request.newBuilder().setN(-10).build())
+                            .map(Response::getPrime)
+                            .collectList()
+                            .block()
+            );
+            assertEquals(Status.INVALID_ARGUMENT.getCode(), e.getStatus().getCode());
         }
     }
 
