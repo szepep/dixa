@@ -1,5 +1,6 @@
 package com.szepep.dixa.primes.service;
 
+import com.google.common.base.Preconditions;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
@@ -50,15 +51,17 @@ public final class EratosthenesGenerator implements Generator {
 
     @Override
     public Stream<Integer> primesUntil(final int number) throws IllegalArgumentException {
+        Preconditions.checkArgument(number >= 0, "The number must be zero or positive");
+
         return IntStream.range(0, number / batchSize + 1)
                 .boxed()
                 .flatMap(i -> {
-                            int from = i * batchSize;
-                            int to = (i + 1) * batchSize;
+                    int from = i * batchSize;
+                    int to = (i + 1) * batchSize;
 
-                            // fetching the volatile max ensures fetching of bits
-                            if (to > max) sieve(to);
-                            return IntStream.range(from, to)
+                    // fetching the volatile max ensures fetching of bits
+                    if (to > max) sieve(to);
+                    return IntStream.range(from, to)
                                     .filter(bits::get)
                                     .boxed();
                         }
