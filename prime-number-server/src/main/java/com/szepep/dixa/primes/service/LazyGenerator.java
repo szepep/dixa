@@ -2,7 +2,6 @@ package com.szepep.dixa.primes.service;
 
 import com.google.common.base.Preconditions;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.concurrent.ThreadSafe;
 import java.util.Iterator;
@@ -18,7 +17,6 @@ import java.util.stream.StreamSupport;
  * Generates lazy stream of prime numbers and caches already identified primes.
  */
 @Slf4j
-@Component
 @ThreadSafe
 public class LazyGenerator implements Generator {
 
@@ -56,7 +54,7 @@ public class LazyGenerator implements Generator {
         return prime;
     }
 
-    private boolean isPrime(long n) {
+    private boolean isPrime(int n) {
         boolean prime = true;
         for (int i = 0; prime && primeNumbers.get(i) * primeNumbers.get(i) <= n; ++i) {
             prime = n % primeNumbers.get(i) != 0;

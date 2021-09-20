@@ -17,12 +17,9 @@ import java.util.stream.Stream;
 @ThreadSafe
 public final class EratosthenesGenerator implements Generator {
 
-    private final int batchSize = 1000;
+    private final int batchSize = 1_000;
 
     private final BitSet bits = new BitSet();
-
-    // volatile works as memory barrier to synchronize the bits
-    // DO NOT CHANGE the order of variables, the volatile must be the last instance variable.
     private volatile int max = 2;
 
     EratosthenesGenerator() {
@@ -40,9 +37,9 @@ public final class EratosthenesGenerator implements Generator {
         double sqrt = Math.ceil(Math.sqrt(n));
         for (int i = 2; i < sqrt; ++i)
             if (bits.get(i)) {
-                int start = max > i * i
-                        ? max - ((max - (i * i)) % i) + i
-                        : (i * i);
+                int start = max <= i * i
+                        ? (i * i)                           // start from the beginning
+                        : max - ((max - (i * i)) % i) + i;  // continue where we stopped
                 for (int j = start; j >= 0 && j < nPlus1; j += i)
                     bits.set(j, false);
             }
@@ -56,12 +53,13 @@ public final class EratosthenesGenerator implements Generator {
         return IntStream.range(0, number / batchSize + 1)
                 .boxed()
                 .flatMap(i -> {
-                    int from = i * batchSize;
-                    int to = (i + 1) * batchSize;
+                            int from = i * batchSize;
+                            int to = (i + 1) * batchSize;
 
-                    // fetching the volatile max ensures fetching of bits
-                    if (to > max) sieve(to);
-                    return IntStream.range(from, to)
+                            // the volatile max acts as memory barrier, all previous computation must be visible
+                            // to current thread -> bits are up to date even if sieve is not called.
+                            if (to > max) sieve(to);
+                            return IntStream.range(from, to)
                                     .filter(bits::get)
                                     .boxed();
                         }

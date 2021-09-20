@@ -57,8 +57,22 @@ backed by `ConcurrentHashMap` to benefit from atomic `computeIfAbsent` method.
 Other solution is much faster and requires less memory
 [EratosthenesGenerator](prime-number-server/src/main/java/com/szepep/dixa/primes/service/EratosthenesGenerator.java). It
 is inspired by [Sieve of Eratosthenes](https://en.wikipedia.org/wiki/Sieve_of_Eratosthenes) but the implementation is
-lazy and thread safe and non-blocking when the primes are already computed in the range. Each prime is only computed
-once. This implementation uses a trick in JVM, `voltaile` as memory barrier.
+lazy and thread safe. Each prime is only computed once.
+
+A super complex incarnation of Eratosthenes
+sieve [NonBlockingEratosthenesGenerator](prime-number-server/src/main/java/com/szepep/dixa/primes/service/NonBlockingEratosthenesGenerator.java)
+tries to not use global synchronized block just lock the smallest possible computation fragment using read-write lock.
+There is not much performance benefit, the average time spent in providing prime numbers in 20 parallel threads with
+limit between 1,000,000 and
+5,000,000: [EratosthenesGeneratorTest#performanceComparison](prime-number-server/src/test/java/com/szepep/dixa/primes/service/EratosthenesGeneratorTest.java)
+
+```
+EratosthenesGenerator: 6531ms
+NonBlockingEratosthenesGenerator: 6287ms 
+LazyGenerator: 36475ms
+```
+
+The clear winner is `EratosthenesGenerator`, not to complex to understand but performs well.
 
 ### Missing from the implementation:
 
