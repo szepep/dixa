@@ -1,12 +1,27 @@
 package com.szepep.dixa.primes.service;
 
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.concurrent.ThreadSafe;
 import java.util.BitSet;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+/**
+ * Generator using Eratosthenes sieve. Returns continuous results and does lazy computation.
+ */
+@Component
+@Primary
+@ThreadSafe
 public final class EratosthenesGenerator implements Generator {
 
+    private final int batchSize = 1000;
+
     private final BitSet bits = new BitSet();
+
+    // volatile works as memory barrier to synchronize the bits
+    // DO NOT CHANGE the order of variables, the volatile must be the last instance variable.
     private volatile int max = 2;
 
     EratosthenesGenerator() {
@@ -15,7 +30,7 @@ public final class EratosthenesGenerator implements Generator {
     }
 
     synchronized void sieve(int n) {
-        if (n <= max) return;
+        if (n <= max) return; // other thread already computed
 
         int nPlus1 = n + 1;
 
@@ -34,15 +49,20 @@ public final class EratosthenesGenerator implements Generator {
     }
 
     @Override
-    public Stream<Long> primesUntil(long number) throws IllegalArgumentException {
-        int n = Math.toIntExact(number);
-        if (n > max) {
-            IntStream.range(0, n / 100 + 1)
-                    .forEach(i -> sieve((i + 1) * 100));
-        }
+    public Stream<Integer> primesUntil(final int number) throws IllegalArgumentException {
+        return IntStream.range(0, number / batchSize + 1)
+                .boxed()
+                .flatMap(i -> {
+                            int from = i * batchSize;
+                            int to = (i + 1) * batchSize;
 
-        return IntStream.rangeClosed(0, n)
-                .filter(bits::get)
-                .mapToObj(p -> (long) p);
+                            // fetching the volatile max ensures fetching of bits
+                            if (to > max) sieve(to);
+                            return IntStream.range(from, to)
+                                    .filter(bits::get)
+                                    .boxed();
+                        }
+                )
+                .takeWhile(p -> p <= number);
     }
 }

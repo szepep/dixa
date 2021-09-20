@@ -32,7 +32,7 @@ class GrpcPrimeServiceTest {
     private Server server;
     private ManagedChannel channel;
 
-    static Flux<Response> primes(long... primes) {
+    static Flux<Response> primes(int... primes) {
         var stream = Arrays.stream(primes).mapToObj(p -> Response.newBuilder().setPrime(p).build());
         return Flux.fromStream(stream);
     }
@@ -68,11 +68,11 @@ class GrpcPrimeServiceTest {
     public void testHappyPath() {
         when(mockService.get(any())).thenReturn(primes(2, 3, 5, 7, 11));
 
-        var result = grpcPrimeService.prime(11L)
+        var result = grpcPrimeService.prime(11)
                 .collectList()
                 .block();
 
-        assertEquals(Lists.newArrayList(2L, 3L, 5L, 7L, 11L), result);
+        assertEquals(Lists.newArrayList(2, 3, 5, 7, 11), result);
     }
 
     @Test
@@ -84,11 +84,11 @@ class GrpcPrimeServiceTest {
                 primes(2, 3, 5, 7, 11)
         );
 
-        var result = grpcPrimeService.prime(11L)
+        var result = grpcPrimeService.prime(11)
                 .collectList()
                 .block();
 
-        assertEquals(Lists.newArrayList(2L, 3L, 5L, 7L, 11L), result);
+        assertEquals(Lists.newArrayList(2, 3, 5, 7, 11), result);
     }
 
     @Test
@@ -105,7 +105,7 @@ class GrpcPrimeServiceTest {
         );
 
         assertThrows(IllegalStateException.class, () ->
-                grpcPrimeService.prime(11L)
+                grpcPrimeService.prime(11)
                         .collectList()
                         .block()
         );
@@ -120,7 +120,7 @@ class GrpcPrimeServiceTest {
         );
 
         assertThrows(StatusRuntimeException.class, () ->
-                grpcPrimeService.prime(11L)
+                grpcPrimeService.prime(11)
                         .collectList()
                         .block()
         );
@@ -134,11 +134,11 @@ class GrpcPrimeServiceTest {
                 primes(2, 3, 5, 7, 11)
         );
 
-        var result = grpcPrimeService.prime(11L)
+        var result = grpcPrimeService.prime(11)
                 .collectList()
                 .block();
 
-        assertEquals(Lists.newArrayList(2L, 3L, 5L, 7L, 11L), result);
+        assertEquals(Lists.newArrayList(2, 3, 5, 7, 11), result);
     }
 
 }

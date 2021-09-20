@@ -11,9 +11,9 @@ service Service {
 }
 
 message Request {
-  int64 n = 1;
+  int32 n = 1;
 }
 
 message Response {
-  int64 prime = 1;
+  int32 prime = 1;
 }

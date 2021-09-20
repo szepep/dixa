@@ -33,7 +33,7 @@ public class GrpcPrimeService implements PrimeService {
     private final GrpcConfiguration.GrpcConfig config;
 
     @Override
-    public Flux<Long> prime(Long number) {
+    public Flux<Integer> prime(final int number) {
         return stub.get(Request.newBuilder().setN(number).build())
                 .map(Response::getPrime)
                 .retryWhen(Retry

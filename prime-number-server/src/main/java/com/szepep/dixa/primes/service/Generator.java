@@ -14,5 +14,5 @@ public interface Generator {
      * @return Stream of prime numbers.
      * @throws IllegalArgumentException when the number is not supported, e.g. negative, too large.
      */
-    Stream<Long> primesUntil(long number) throws IllegalArgumentException;
+    Stream<Integer> primesUntil(int number) throws IllegalArgumentException;
 }

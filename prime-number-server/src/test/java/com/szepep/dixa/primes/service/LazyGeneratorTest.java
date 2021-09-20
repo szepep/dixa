@@ -24,7 +24,7 @@ class LazyGeneratorTest {
         var generator = new LazyGenerator();
         var primesUntil10 = generator.primesUntil(10).collect(toList());
 
-        assertEquals(Lists.list(2L, 3L, 5L, 7L), primesUntil10);
+        assertEquals(Lists.list(2, 3, 5, 7), primesUntil10);
     }
 
     @Test
@@ -32,7 +32,7 @@ class LazyGeneratorTest {
         var generator = new LazyGenerator();
         var primesUntil10 = generator.primesUntil(13).collect(toList());
 
-        assertEquals(Lists.list(2L, 3L, 5L, 7L, 11L, 13L), primesUntil10);
+        assertEquals(Lists.list(2, 3, 5, 7, 11, 13), primesUntil10);
     }
 
     @Test

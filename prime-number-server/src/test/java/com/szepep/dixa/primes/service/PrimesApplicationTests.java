@@ -51,7 +51,7 @@ class PrimesApplicationTests {
                     .collectList()
                     .block();
 
-            assertEquals(Lists.newArrayList(2L, 3L, 5L, 7L), primes);
+            assertEquals(Lists.newArrayList(2, 3, 5, 7), primes);
         }
     }
 

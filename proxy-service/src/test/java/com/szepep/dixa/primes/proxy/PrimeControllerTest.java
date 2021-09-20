@@ -8,7 +8,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -24,7 +24,7 @@ class PrimeControllerTest {
 
     @Test
     public void testOutput() {
-        when(primeService.prime(any())).thenReturn(Flux.just(2L, 3L, 5L, 7L, 11L));
+        when(primeService.prime(anyInt())).thenReturn(Flux.just(2, 3, 5, 7, 11));
 
         client.get()
                 .uri("/prime/12")
@@ -35,12 +35,12 @@ class PrimeControllerTest {
                 .expectBody(String.class)
                 .consumeWith(body -> assertEquals("2,3,5,7,11", body.getResponseBody()));
 
-        verify(primeService).prime(eq(12L));
+        verify(primeService).prime(eq(12));
     }
 
     @Test
     public void testSinglePrime() {
-        when(primeService.prime(any())).thenReturn(Flux.just(2L));
+        when(primeService.prime(anyInt())).thenReturn(Flux.just(2));
 
         client.get()
                 .uri("/prime/2")
@@ -51,7 +51,7 @@ class PrimeControllerTest {
                 .expectBody(String.class)
                 .consumeWith(body -> assertEquals("2", body.getResponseBody()));
 
-        verify(primeService).prime(eq(2L));
+        verify(primeService).prime(eq(2));
     }
 
     @Test

@@ -52,9 +52,13 @@ https://alvinalexander.com/text/prime-number-algorithm-scala-scala-stream-class/
 
 To mimic similar laziness and immutability I had to do a pretty complex logic in
 [LazyGenerator](prime-number-server/src/main/java/com/szepep/dixa/primes/service/LazyGenerator.java)
-backed by `ConcurrentHashMap` to benefit from atomic `computeIfAbsent` method. The picked algorithm is computationally
-more expensive than the
-[Sieve of Eratosthenes](https://en.wikipedia.org/wiki/Sieve_of_Eratosthenes) but requires less memory.
+backed by `ConcurrentHashMap` to benefit from atomic `computeIfAbsent` method.
+
+Other solution is much faster and requires less memory
+[EratosthenesGenerator](prime-number-server/src/main/java/com/szepep/dixa/primes/service/EratosthenesGenerator.java). It
+is inspired by [Sieve of Eratosthenes](https://en.wikipedia.org/wiki/Sieve_of_Eratosthenes) but the implementation is
+lazy and thread safe and non-blocking when the primes are already computed in the range. Each prime is only computed
+once. This implementation uses a trick in JVM, `voltaile` as memory barrier.
 
 ### Missing from the implementation:
 

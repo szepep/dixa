@@ -28,7 +28,7 @@ public class PrimeController {
      */
     @SuppressWarnings("deprecation")
     @GetMapping(value = "/{number}", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
-    public Flux<String> primes(@PathVariable("number") long number) {
+    public Flux<String> primes(@PathVariable("number") int number) {
         Preconditions.checkArgument(number >= 0, "The number must be greater or equal to 0");
         AtomicBoolean first = new AtomicBoolean(true);
         return service

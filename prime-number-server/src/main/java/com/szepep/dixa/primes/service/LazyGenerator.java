@@ -9,7 +9,7 @@ import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -29,15 +29,15 @@ public class LazyGenerator implements Generator {
      * However in multithreaded environment we can use the atomic
      * {@link ConcurrentHashMap#computeIfAbsent(Object, Function)} to ensure no new prime is calculated multiple times.
      */
-    private final ConcurrentHashMap<Integer, Long> primeNumbers;
-    private final AtomicLong max;
+    private final ConcurrentHashMap<Integer, Integer> primeNumbers;
+    private final AtomicInteger max;
 
     public LazyGenerator() {
         primeNumbers = new ConcurrentHashMap<>();
-        primeNumbers.put(0, 2L);
+        primeNumbers.put(0, 2);
         logPrime(2);
 
-        max = new AtomicLong(3);
+        max = new AtomicInteger(3);
     }
 
     private static void logPrime(long prime) {
@@ -49,8 +49,8 @@ public class LazyGenerator implements Generator {
                 Spliterators.spliteratorUnknownSize(primes, Spliterator.ORDERED), false);
     }
 
-    private Long calcNext() {
-        long prime;
+    private Integer calcNext() {
+        int prime;
         //noinspection StatementWithEmptyBody
         while (!isPrime(prime = max.getAndAdd(2))) { /* noop */ }
         return prime;
@@ -75,7 +75,7 @@ public class LazyGenerator implements Generator {
      * @throws IllegalArgumentException if the input number is wrong.
      */
     @Override
-    public Stream<Long> primesUntil(long number) throws IllegalArgumentException {
+    public Stream<Integer> primesUntil(final int number) throws IllegalArgumentException {
         Preconditions.checkArgument(number >= 0, "The number must be zero or positive");
 
         var primes = primeNumbersJustAfter(number);
@@ -89,11 +89,11 @@ public class LazyGenerator implements Generator {
      * @param number Limit, the last element can exceed the limit.
      * @return Iterator of prime numbers.
      */
-    private Iterator<Long> primeNumbersJustAfter(long number) {
+    private Iterator<Integer> primeNumbersJustAfter(int number) {
         return new Iterator<>() {
 
             private int idx = 0;
-            private long lastPrime = -1;
+            private int lastPrime = -1;
 
             @Override
             public boolean hasNext() {
@@ -101,7 +101,7 @@ public class LazyGenerator implements Generator {
             }
 
             @Override
-            public Long next() {
+            public Integer next() {
                 lastPrime = primeNumbers.computeIfAbsent(idx++, idx -> calcNext());
                 return lastPrime;
             }
