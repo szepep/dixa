@@ -1,4 +1,4 @@
-package com.szepep.dixa.primes.proxy;
+package com.szepep.dixa.primes.proxy.service;
 
 import reactor.core.publisher.Flux;
 

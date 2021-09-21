@@ -1,9 +1,12 @@
 package com.szepep.dixa.primes.proxy;
 
+import com.szepep.dixa.primes.proxy.monitoring.UIIDCorrelationId;
+import com.szepep.dixa.primes.proxy.service.PrimeService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 
@@ -14,6 +17,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @WebFluxTest
+@Import(UIIDCorrelationId.class)
 class PrimeControllerTest {
 
     @MockBean

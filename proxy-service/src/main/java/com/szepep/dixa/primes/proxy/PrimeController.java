@@ -1,6 +1,7 @@
 package com.szepep.dixa.primes.proxy;
 
 import com.google.common.base.Preconditions;
+import com.szepep.dixa.primes.proxy.service.PrimeService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -8,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 
+import java.text.MessageFormat;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @RestController
@@ -31,8 +33,7 @@ public class PrimeController {
     public Flux<String> primes(@PathVariable("number") int number) {
         Preconditions.checkArgument(number >= 0, "The number must be greater or equal to 0");
         AtomicBoolean first = new AtomicBoolean(true);
-        return service
-                .prime(number)
+        return service.prime(number)
                 .map(Object::toString)
                 .map(prime -> first.compareAndSet(true, false)
                         ? prime
@@ -47,7 +48,8 @@ public class PrimeController {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handlerException(Exception e) {
-        return new ResponseEntity(e.getMessage(), null, HttpStatus.INTERNAL_SERVER_ERROR);
+        String message = MessageFormat.format("{0}: {1}", e.getClass().getCanonicalName(), e.getMessage());
+        return new ResponseEntity(message, null, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 }

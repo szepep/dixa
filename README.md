@@ -79,8 +79,6 @@ The clear winner is `EratosthenesGenerator`, not to complex to understand but pe
 - Swagger documentation
 - Actuator endpoints - at least `/info` and `/health`
 - Security?
-- `correlationId` to connect the events in the systems. It is easy to implement but a pain to use in plain WebFlux as it
-  have limited support for MDC. (... and back to Kotlin... there is an easy to use MDC support for coroutines)
 
 ### Next steps
 

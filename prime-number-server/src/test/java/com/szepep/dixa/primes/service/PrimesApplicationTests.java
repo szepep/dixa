@@ -46,7 +46,7 @@ class PrimesApplicationTests {
     @Test
     void happyPathTest() throws Exception {
         try (var s = new Stub(config.getPort())) {
-            var primes = s.stub.get(Request.newBuilder().setN(10).build())
+            var primes = s.stub.get(Request.newBuilder().setNumber(10).build())
                     .map(Response::getPrime)
                     .collectList()
                     .block();
@@ -59,7 +59,7 @@ class PrimesApplicationTests {
     void negativeInput() throws Exception {
         try (var s = new Stub(config.getPort())) {
             var e = assertThrows(StatusRuntimeException.class, () ->
-                    s.stub.get(Request.newBuilder().setN(-10).build())
+                    s.stub.get(Request.newBuilder().setNumber(-10).build())
                             .map(Response::getPrime)
                             .collectList()
                             .block()

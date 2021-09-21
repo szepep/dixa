@@ -40,7 +40,7 @@ public class GrpcConfiguration {
     @Configuration
     @ConfigurationProperties(prefix = "grpc")
     @Data
-    static class GrpcConfig {
+    public static class GrpcConfig {
         private String host = "localhost";
         private Integer port = 8080;
         private Integer retryTimeoutMills = 5000;

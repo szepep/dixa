@@ -11,7 +11,8 @@ service Service {
 }
 
 message Request {
-  int32 n = 1;
+  int32 number = 1;
+  optional string correlationId = 2;
 }
 
 message Response {

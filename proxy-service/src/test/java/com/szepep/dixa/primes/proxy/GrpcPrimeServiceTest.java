@@ -1,5 +1,6 @@
 package com.szepep.dixa.primes.proxy;
 
+import com.szepep.dixa.primes.proxy.service.GrpcPrimeService;
 import com.szepep.dixa.proto.ReactorServiceGrpc;
 import com.szepep.dixa.proto.Response;
 import io.grpc.ManagedChannel;

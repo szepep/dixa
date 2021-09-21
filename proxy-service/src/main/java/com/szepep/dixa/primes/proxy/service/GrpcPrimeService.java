@@ -1,6 +1,7 @@
-package com.szepep.dixa.primes.proxy;
+package com.szepep.dixa.primes.proxy.service;
 
 import com.google.common.collect.Sets;
+import com.szepep.dixa.primes.proxy.GrpcConfiguration;
 import com.szepep.dixa.proto.ReactorServiceGrpc;
 import com.szepep.dixa.proto.Request;
 import com.szepep.dixa.proto.Response;
@@ -11,11 +12,13 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
 
 import java.time.Duration;
 import java.util.Set;
 
+import static com.szepep.dixa.primes.proxy.monitoring.CorrelationId.CORRELATION_KEY;
 import static io.grpc.Status.Code.*;
 
 @Service
@@ -34,12 +37,21 @@ public class GrpcPrimeService implements PrimeService {
 
     @Override
     public Flux<Integer> prime(final int number) {
-        return stub.get(Request.newBuilder().setN(number).build())
+        return sendRequest(number)
                 .map(Response::getPrime)
                 .retryWhen(Retry
                         .backoff(config.getMaxRetry(), Duration.ofMillis(config.getRetryTimeoutMills()))
                         .filter(this::retry)
                 );
+    }
+
+    private Flux<Response> sendRequest(Integer n) {
+        var builder = Request.newBuilder().setNumber(n);
+        return Mono.deferContextual(context ->
+                Mono.just(context.getOrEmpty(CORRELATION_KEY)
+                        .map(cid -> builder.setCorrelationId((String) cid).build())
+                        .orElse(builder.build()))
+        ).flatMapMany(stub::get);
     }
 
     private boolean retry(Throwable throwable) {
