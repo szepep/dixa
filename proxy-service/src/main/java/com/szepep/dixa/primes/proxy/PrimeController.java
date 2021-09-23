@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 
 import java.text.MessageFormat;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.IntStream;
 
 @RestController
 @RequestMapping("/prime")
@@ -32,12 +32,14 @@ public class PrimeController {
     @GetMapping(value = "/{number}", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
     public Flux<String> primes(@PathVariable("number") int number) {
         Preconditions.checkArgument(number >= 0, "The number must be greater or equal to 0");
-        AtomicBoolean first = new AtomicBoolean(true);
         return service.prime(number)
                 .map(Object::toString)
-                .map(prime -> first.compareAndSet(true, false)
-                        ? prime
-                        : "," + prime
+                .zipWith(Flux.fromStream(IntStream.iterate(0, i -> i + 1).boxed()))
+                .map(tuple -> {
+                            var prime = tuple.getT1();
+                            var idx = tuple.getT2();
+                            return idx == 0 ? prime : "," + prime;
+                        }
                 );
     }
 
